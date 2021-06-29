@@ -64,6 +64,7 @@ import org.xtuml.bp.core.common.ModelRoot;
 import org.xtuml.bp.core.common.NonRootModelElement;
 import org.xtuml.bp.core.common.PersistableModelComponent;
 import org.xtuml.bp.core.common.PersistenceManager;
+import org.xtuml.bp.core.PackageReference_c;
 
 public class ParserAllActivityModifier implements IAllActivityModifier {
 	private Function_c[] m_func_set;
@@ -535,6 +536,15 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 			String message = "Unsupported container in addActivitiesToList: ";
 			CorePlugin.logError(message, e);
 		}
+		for (int i = 0; i < contents.length; ++i) {
+			pkg = Package_c.getOneEP_PKGOnR8001(contents[i]);  // @TODO - alasdar, chasing 11958
+			if ( pkg != null ) {
+				if ( pkg.Isassigned() ) {
+				    pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+				    contents[i] = PackageableElement_c.getOnePE_PEOnR8001(pkg);
+				}
+			}
+		} 
 		if (kind == ActivityKind.BRIDGE) {
 			nrme_set = Bridge_c.getManyS_BRGsOnR19(ExternalEntity_c.getManyS_EEsOnR8001(contents));
 		} else if (kind == ActivityKind.FUNCTION) {
@@ -978,8 +988,11 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 			}
 		}
 		for (int i = 0; i < pkg_set.length; ++i) {
-			resetPackagesBelow(PackageableElement_c.getOnePE_PEOnR8001(pkg_set[i]));
-			pkg_set[i].Clearscope();
+		    pkg = pkg_set[i];	
+			if ( pkg.Isassigned() )
+                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+			resetPackagesBelow(PackageableElement_c.getOnePE_PEOnR8001(pkg));
+			pkg.Clearscope();
 		}
 		for (int i = 0; i < comp_set.length; ++i) {
 			resetPackagesBelow(PackageableElement_c.getOnePE_PEOnR8001(comp_set[i]));
@@ -1039,6 +1052,8 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Component_c[] comp_set = null;
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
+			if ( pkg.Isassigned() )
+                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			f_set = Function_c.getManyS_SYNCsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
 			pkg_set = Package_c.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
 			comp_set = Component_c.getManyC_CsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
@@ -1223,6 +1238,8 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Component_c[] comp_set = null;
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
+			if ( pkg.Isassigned() )
+                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			o_set = Operation_c.getManyO_TFRsOnR115(
 					ModelClass_c.getManyO_OBJsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg)));
 			pkg_set = Package_c.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
@@ -1683,8 +1700,17 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 				for (int i = 0; i < comps.length; i++) {
 					initializeBodies(modelRoot, comps[i]);
 				}
-				// Note that there is no need to recursively descend packages here
+				// Note that there is no need to recursively descend packages here   @TODO alasdar is not sure he believes this - what about PkgRef?
 				// because R694 has all bodies, including those under packages.
+				Package_c[] pkgs = Package_c
+						.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8003((Component_c) nrme));
+				for (int i = 0; i < pkgs.length; i++) {
+					Package_c pkg = pkgs[i];
+					if ( pkg.Isassigned() ) {
+		                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+					    initializeBodies(modelRoot, pkg);
+					}
+				}
 			} else if (nrme instanceof Package_c) {
 				PackageableElement_c pe = PackageableElement_c.getOnePE_PEOnR8001((Package_c) nrme);
 				// initialize only bodies that are within

@@ -4255,6 +4255,9 @@ for each clazz in classes
 end for;
 select many packages related by self->PE_PE[R8000]->EP_PKG[R8001];
 for each package in packages
+  if (package.isAssigned())
+    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
+  end if;
   package.initializeClasses(compInstID:param.compInstID);
 end for;',
 	1,
@@ -4284,8 +4287,11 @@ if not_empty compInst
   return true;
 end if;
 select many packages related by self->PE_PE[R8000]->EP_PKG[R8001];
-for each childPkg in packages
-  if childPkg.isExecutingOrIsChildExecuting()
+for each package in packages
+  if (package.isAssigned())
+    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
+  end if;
+  if package.isExecutingOrIsChildExecuting()
     return true;
   end if;
 end for;
@@ -4347,8 +4353,11 @@ if not_empty compR
   return true; 
 end if;
 select many packages related by self->PE_PE[R8000]->EP_PKG[R8001];
-for each childPkg in packages
-  if childPkg.ownsExecutableElementsOrChildOwnsExecutableElements()
+for each package in packages
+  if (package.isAssigned())
+    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
+  end if;
+  if package.ownsExecutableElementsOrChildOwnsExecutableElements()
     return true;
   end if;
 end for;
