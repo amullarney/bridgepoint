@@ -41,6 +41,9 @@
     .assign attr_remainder = "$tcb_rest{rel_chain}"
     .assign attr_phrase = "$tcb_phrase{rel_chain}"
   .end if
+  .if ( attr_phrase != "" )
+	  .print" am++ found association phrase ${attr_phrase} in ${rel_chain} "
+  .end if
   .//
   .invoke sti = STRING_TO_INTEGER(attr_rel_num_str)
   .assign rel_num = sti.result
@@ -303,7 +306,7 @@ ${nav_string.body}
           .invoke ccn = get_class_name(cur_class)
           .invoke result = get_nav_func_name(cur_class, nav.rel, "one")
           .assign nav_func_name = "${result.body}"
-${ccn.body}.${nav_func_name}(\
+${ccn.body}.${nav_func_name}${nav.phrase}(\
           .//
           .// Note we don't assign the newly parsed key letter until after
           .// emitting the call. This is because the navigation is being 
