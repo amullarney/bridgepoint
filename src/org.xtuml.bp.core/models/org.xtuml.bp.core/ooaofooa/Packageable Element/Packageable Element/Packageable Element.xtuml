@@ -257,7 +257,7 @@ end if;
 if self.type == ElementTypeConstants::PACKAGE
   select one package related by self->EP_PKG[R8001];
   if not_empty package and self.Element_ID != param.delegatingPkgID
-    if (package.isAssigned())  // @TODO ?
+    if (package.isAssigned())  // navigate to referenced package
       select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
     end if;
     package.collectVisibleElementsForName(name:param.name,

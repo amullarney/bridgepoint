@@ -537,7 +537,7 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 			CorePlugin.logError(message, e);
 		}
 		for (int i = 0; i < contents.length; ++i) {
-			pkg = Package_c.getOneEP_PKGOnR8001(contents[i]);  // @TODO - alasdar, chasing 11958
+			pkg = Package_c.getOneEP_PKGOnR8001(contents[i]);
 			if ( pkg != null ) {
 				if ( pkg.Isassigned() ) {
 				    pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
@@ -1327,6 +1327,8 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Component_c[] comp_set = null;
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
+			if ( pkg.Isassigned() )
+                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			a_set = Attribute_c.getManyO_ATTRsOnR106(BaseAttribute_c.getManyO_BATTRsOnR107(DerivedBaseAttribute_c
 					.getManyO_DBATTRsOnR107(BaseAttribute_c.getManyO_BATTRsOnR106(Attribute_c.getManyO_ATTRsOnR102(
 							ModelClass_c.getManyO_OBJsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg)))))));
@@ -1455,6 +1457,8 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Component_c[] comp_set = null;
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
+			if ( pkg.Isassigned() )
+                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			if (kind == SMKind.instanceBased) {
 				st_set = StateMachineState_c.getManySM_STATEsOnR501(
 						StateMachine_c.getManySM_SMsOnR517(InstanceStateMachine_c.getManySM_ISMsOnR518(
@@ -1597,6 +1601,8 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Component_c[] comp_set = null;
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
+			if ( pkg.Isassigned() )
+                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			if (kind == SMKind.instanceBased) {
 				tran_set = Transition_c.getManySM_TXNsOnR505(
 						StateMachine_c.getManySM_SMsOnR517(InstanceStateMachine_c.getManySM_ISMsOnR518(
@@ -1699,10 +1705,11 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 						.getManyC_CsOnR8001(PackageableElement_c.getManyPE_PEsOnR8003((Component_c) nrme));
 				for (int i = 0; i < comps.length; i++) {
 					initializeBodies(modelRoot, comps[i]);
-				}
-				// Note that there is no need to recursively descend packages here   @TODO alasdar is not sure he believes this - what about PkgRef?
+				
+				// Note that there is no need to recursively descend packages here
 				// because R694 has all bodies, including those under packages.
-				Package_c[] pkgs = Package_c
+				// Note: not the case if there are assigned Package References. ref Issue 11958
+				Package_c[] 
 						.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8003((Component_c) nrme));
 				for (int i = 0; i < pkgs.length; i++) {
 					Package_c pkg = pkgs[i];
