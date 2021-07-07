@@ -1705,11 +1705,10 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 						.getManyC_CsOnR8001(PackageableElement_c.getManyPE_PEsOnR8003((Component_c) nrme));
 				for (int i = 0; i < comps.length; i++) {
 					initializeBodies(modelRoot, comps[i]);
-				
-				// Note that there is no need to recursively descend packages here
+				}
+				// Note that there is no need to recursively descend packages here   @TODO alasdar is not sure he believes this - what about PkgRef?
 				// because R694 has all bodies, including those under packages.
-				// Note: not the case if there are assigned Package References. ref Issue 11958
-				Package_c[] 
+				Package_c[] pkgs = Package_c
 						.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8003((Component_c) nrme));
 				for (int i = 0; i < pkgs.length; i++) {
 					Package_c pkg = pkgs[i];
