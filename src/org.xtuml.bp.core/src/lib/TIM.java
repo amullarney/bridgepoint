@@ -98,7 +98,8 @@ public class TIM {
             }
 
             if (!timersList.isEmpty() && !suspended){
-              ComponentInstance_c ee = ComponentInstance_c.ComponentInstanceInstance(timersList.get(0).getModelRoot());
+              ComponentInstance_c ee = timersMap.get(timersList.get(0));
+//            ComponentInstance_c ee = ComponentInstance_c.ComponentInstanceInstance(timersList.get(0).getModelRoot());
               if (ee != null){
                 try {
                   ModelRoot.disableChangeNotification();
@@ -191,8 +192,9 @@ public class TIM {
   public static boolean performSimulatedTime() {
     boolean eventDelivered = false;
     if (!suspended && !timersList.isEmpty()) {
-      ComponentInstance_c ee = ComponentInstance_c
-          .ComponentInstanceInstance(timersList.get(0).getModelRoot());
+      ComponentInstance_c ee = timersMap.get(timersList.get(0));
+//      ComponentInstance_c ee = ComponentInstance_c
+//          .ComponentInstanceInstance(timersList.get(0).getModelRoot());
       if (ee != null) {
         try {
           ModelRoot.disableChangeNotification();
