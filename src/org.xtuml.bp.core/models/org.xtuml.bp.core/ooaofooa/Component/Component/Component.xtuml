@@ -2275,9 +2275,9 @@ INSERT INTO O_TFR
 	'// Component.initializeClasses()
 select many packages related by self->PE_PE[R8003]->EP_PKG[R8001];
 for each package in packages
-  if (package.isAssigned())
-    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
-  end if;
+//  if (package.isAssigned())  @TODO am
+//    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
+//  end if;
   package.initializeClasses(compInstID:param.componentInstanceID);
 end for;',
 	1,
@@ -2731,9 +2731,9 @@ select many packages related by self->PE_PE[R8003]->EP_PKG[R8001];
 // We''re preincrementing the index
 count = -1;
 for each package in packages
-  if (package.isAssigned())
-    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
-  end if;
+//  if (package.isAssigned())  @TODO am
+//    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
+//  end if;
   if (not_empty package)
       count = count+1;
   end if;

@@ -560,9 +560,9 @@ INSERT INTO O_TFR
 	'
   select one package related by self->EP_PKG[R2970];
   if not_empty package
-    if (package.isAssigned())
-      select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
-    end if;
+//    if (package.isAssigned())  @TODO am
+//      select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
+//    end if;
     package.initializeClasses(compInstID:self.Execution_Engine_ID);
   else
     select one compRef related by self->CL_IC[R2963];
