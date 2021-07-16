@@ -41,9 +41,6 @@
     .assign attr_remainder = "$tcb_rest{rel_chain}"
     .assign attr_phrase = "$tcb_phrase{rel_chain}"
   .end if
-  .if ( attr_phrase != "" )
-	  .print" am++ found association phrase ${attr_phrase} in ${rel_chain} "
-  .end if
   .//
   .invoke sti = STRING_TO_INTEGER(attr_rel_num_str)
   .assign rel_num = sti.result

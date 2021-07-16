@@ -96,6 +96,7 @@ INSERT INTO T_TPS VALUES (3,   26, '->S_SPARM[R24]');
 INSERT INTO T_TPS VALUES (1, 27, '->EP_PKG[R1401]', '', 'Isexecutingorischildexecuting() == true');
 INSERT INTO T_TPS VALUES (27, 27, '->PE_PE[R8000]->EP_PKG[R8001]', '', 'Isexecutingorownsexecutableelements() == true');
 INSERT INTO T_TPS VALUES (27,   3, '->PE_PE[R8000]->S_SYNC[R8001]');
+INSERT INTO T_TPS VALUES (27,   3, '->EP_PKGREF[R1402.''RefersTo'']->EP_PKG[R1402.''RefersTo'']->PE_PE[R8000]->S_SYNC[R8001]');
 INSERT INTO T_TPS VALUES (27,   4, '->CSME_CIE[R2971]');
 INSERT INTO T_TPS VALUES (27,   11, '->PE_PE[R8000]->C_C[R8001]', '', 'Isexecutingorischildexecuting() == true');
 INSERT INTO T_TPS VALUES (27,   22, '->PE_PE[R8000]->CL_IC[R8001]', '', 'Isexecuting() == true');
