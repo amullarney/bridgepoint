@@ -162,6 +162,22 @@ ${rel_nav.body}\
   .assign isSpecialCase = false
   .assign childCount = 0
   .for each spec in child_specs
+
+    .assign rel_chain = spec.ParentChildRelChain
+    .assign pkgref = false
+    .while ( not pkgref )
+      .assign prkl = "$tcf_kl{rel_chain}"
+      .if ( prkl == "" )
+    	.break while
+      .end if
+      .assign rel_chain = "$tcf_rest{rel_chain}"
+      .if ( prkl == "EP_PKGREF" )
+        .print " *********** Found EP_PKGREF in navigation chain in getChildren ******************** "
+        .assign pkgref = true
+      .end if
+    .end while
+
+.if ( not pkgref )
     .select one child related by spec->T_TNS[R1001]
     .assign relNumber = "$tcf_rel{spec.ParentChildRelChain}"
     .assign query = spec.WhereClause
@@ -197,7 +213,10 @@ ${rel_nav.body}\
     .else
     resultSize += ${resultName}.length;
     .end if
+
+.end if
   .end for
+
   .if ( not isSpecialCase )
     Object [] result = new Object [resultSize];
     .if (not_empty child_specs)
@@ -206,6 +225,22 @@ ${rel_nav.body}\
   .end if
   .assign childCount = 0
   .for each spec in child_specs
+
+    .assign rel_chain = spec.ParentChildRelChain
+    .assign pkgref = false
+    .while ( not pkgref )
+      .assign prkl = "$tcf_kl{rel_chain}"
+      .if ( prkl == "" )
+  	    .break while
+      .end if
+      .assign rel_chain = "$tcf_rest{rel_chain}"
+      .if ( prkl == "EP_PKGREF" )
+        .print " *********** Found EP_PKGREF in navigation chain in getChildren ******************** "
+        .assign pkgref = true
+      .end if
+    .end while
+
+.if ( not pkgref )
     .select one child related by spec->T_TNS[R1001]
     .assign relNumber = "$tcf_rel{spec.ParentChildRelChain}"
     .assign resultName = "$lr{child.CategoryName}_${relNumber}_${childCount}"
@@ -227,7 +262,10 @@ ${rel_nav.body}\
     .if ((tree_node.Key_Lett == "I_EXE") and (child.Key_Lett != "C_PO"))
     }
     .end if
+
+.end if
   .end for
+
     return result;
   }
   /**
