@@ -162,22 +162,23 @@ ${rel_nav.body}\
   .assign isSpecialCase = false
   .assign childCount = 0
   .for each spec in child_specs
-
+    .// Skip any spec with pkg ref in chain, unless looking for functions
     .assign rel_chain = spec.ParentChildRelChain
     .assign pkgref = false
-    .while ( not pkgref )
+	.assign synref = false
+	.assign prkl = "A"
+    .while ( prkl != "" )
       .assign prkl = "$tcf_kl{rel_chain}"
-      .if ( prkl == "" )
-    	.break while
-      .end if
       .assign rel_chain = "$tcf_rest{rel_chain}"
       .if ( prkl == "EP_PKGREF" )
-        .print " *********** Found EP_PKGREF in navigation chain in getChildren ******************** "
         .assign pkgref = true
+      .end if
+      .if ( prkl == "S_SYNC" )
+        .assign synref = true
       .end if
     .end while
 
-.if ( not pkgref )
+.if (( not pkgref ) or ( synref ))
     .select one child related by spec->T_TNS[R1001]
     .assign relNumber = "$tcf_rel{spec.ParentChildRelChain}"
     .assign query = spec.WhereClause
@@ -225,22 +226,23 @@ ${rel_nav.body}\
   .end if
   .assign childCount = 0
   .for each spec in child_specs
+  .// Skip any spec with pkg ref in chain, unless looking for functions
+  .assign rel_chain = spec.ParentChildRelChain
+  .assign pkgref = false
+	.assign synref = false
+	.assign prkl = "A"
+  .while ( prkl != "" )
+    .assign prkl = "$tcf_kl{rel_chain}"
+    .assign rel_chain = "$tcf_rest{rel_chain}"
+    .if ( prkl == "EP_PKGREF" )
+      .assign pkgref = true
+    .end if
+    .if ( prkl == "S_SYNC" )
+      .assign synref = true
+    .end if
+  .end while
 
-    .assign rel_chain = spec.ParentChildRelChain
-    .assign pkgref = false
-    .while ( not pkgref )
-      .assign prkl = "$tcf_kl{rel_chain}"
-      .if ( prkl == "" )
-  	    .break while
-      .end if
-      .assign rel_chain = "$tcf_rest{rel_chain}"
-      .if ( prkl == "EP_PKGREF" )
-        .print " *********** Found EP_PKGREF in navigation chain in getChildren ******************** "
-        .assign pkgref = true
-      .end if
-    .end while
-
-.if ( not pkgref )
+.if (( not pkgref ) or ( synref ))
     .select one child related by spec->T_TNS[R1001]
     .assign relNumber = "$tcf_rel{spec.ParentChildRelChain}"
     .assign resultName = "$lr{child.CategoryName}_${relNumber}_${childCount}"
