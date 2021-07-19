@@ -2479,9 +2479,9 @@ INSERT INTO O_TFR
 if(not_empty system)
   select many packages related by self->PE_PE[R8003]->EP_PKG[R8001];
   for each package in packages
-    if (package.isAssigned())
-      select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
-    end if;
+//    if (package.isAssigned())  @TODO am - necessary? 7/17 .. remove?
+//      select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
+//    end if;
     relate package to system across R1405;
     package.associateWithSystem(sysID:param.id);
   end for;
@@ -2952,9 +2952,9 @@ end if;
 // recursively call for all children
 select many pkgs related by self->PE_PE[R8003]->EP_PKG[R8001];
 for each package in pkgs
-  if (package.isAssigned())
-    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
-  end if;
+//  if (package.isAssigned())  @TODO am 7/17 experiment with removal
+//    select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
+//  end if;
   package.collectReferencesForSynchronization(referenceList:param.referenceList,
                                                        syncType:param.syncType);
 end for;
