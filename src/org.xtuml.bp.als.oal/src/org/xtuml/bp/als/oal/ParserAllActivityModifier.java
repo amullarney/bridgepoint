@@ -1149,6 +1149,8 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Component_c[] comp_set = null;
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
+			if ( pkg.Isassigned() )
+                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			b_set = Bridge_c.getManyS_BRGsOnR19(
 					ExternalEntity_c.getManyS_EEsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg)));
 			pkg_set = Package_c.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
@@ -1706,8 +1708,9 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 				for (int i = 0; i < comps.length; i++) {
 					initializeBodies(modelRoot, comps[i]);
 				}
-				// Note that there is no need to recursively descend packages here   @TODO alasdar is not sure he believes this - what about PkgRef?
+				// Note that there is no need to recursively descend packages here
 				// because R694 has all bodies, including those under packages.
+				// Note: not the case if there are assigned Package References
 				Package_c[] pkgs = Package_c
 						.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8003((Component_c) nrme));
 				for (int i = 0; i < pkgs.length; i++) {
