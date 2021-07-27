@@ -4290,9 +4290,6 @@ if not_empty compInst
 end if;
 select many packages related by self->PE_PE[R8000]->EP_PKG[R8001];
 for each package in packages
-  if (package.isAssigned())
-    select one referredTo related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
-  end if;
   if package.isExecutingOrIsChildExecuting()
     return true;
   end if;
@@ -4340,7 +4337,7 @@ INSERT INTO O_TFR
 	'// Package.ownsExecutableElementsOrChildOwnsExecutableElements()
 
 package = self;
-if (package.isAssigned())
+if (package.isAssigned())  // preserve value of ''self''
   select one package related by package->EP_PKGREF[R1402.''refers to'']->EP_PKG[R1402.''refers to''];
 end if;
 

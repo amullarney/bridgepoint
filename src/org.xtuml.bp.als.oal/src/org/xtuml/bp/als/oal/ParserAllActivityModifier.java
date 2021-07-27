@@ -988,9 +988,9 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 			}
 		}
 		for (int i = 0; i < pkg_set.length; ++i) {
-		    pkg = pkg_set[i];	
+			pkg = pkg_set[i];	
 			if ( pkg.Isassigned() )
-                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+				pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			resetPackagesBelow(PackageableElement_c.getOnePE_PEOnR8001(pkg));
 			pkg.Clearscope();
 		}
@@ -1053,7 +1053,7 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
 			if ( pkg.Isassigned() )
-                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+				pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			f_set = Function_c.getManyS_SYNCsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
 			pkg_set = Package_c.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
 			comp_set = Component_c.getManyC_CsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
@@ -1150,7 +1150,7 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
 			if ( pkg.Isassigned() )
-                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+				pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			b_set = Bridge_c.getManyS_BRGsOnR19(
 					ExternalEntity_c.getManyS_EEsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg)));
 			pkg_set = Package_c.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
@@ -1241,7 +1241,7 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
 			if ( pkg.Isassigned() )
-                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+				pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			o_set = Operation_c.getManyO_TFRsOnR115(
 					ModelClass_c.getManyO_OBJsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg)));
 			pkg_set = Package_c.getManyEP_PKGsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg));
@@ -1330,7 +1330,7 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
 			if ( pkg.Isassigned() )
-                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+				pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			a_set = Attribute_c.getManyO_ATTRsOnR106(BaseAttribute_c.getManyO_BATTRsOnR107(DerivedBaseAttribute_c
 					.getManyO_DBATTRsOnR107(BaseAttribute_c.getManyO_BATTRsOnR106(Attribute_c.getManyO_ATTRsOnR102(
 							ModelClass_c.getManyO_OBJsOnR8001(PackageableElement_c.getManyPE_PEsOnR8000(pkg)))))));
@@ -1460,7 +1460,7 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
 			if ( pkg.Isassigned() )
-                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+				pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			if (kind == SMKind.instanceBased) {
 				st_set = StateMachineState_c.getManySM_STATEsOnR501(
 						StateMachine_c.getManySM_SMsOnR517(InstanceStateMachine_c.getManySM_ISMsOnR518(
@@ -1604,7 +1604,7 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 		Package_c pkg = Package_c.getOneEP_PKGOnR8001(pkgElem);
 		if (pkg != null) {
 			if ( pkg.Isassigned() )
-                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+				pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
 			if (kind == SMKind.instanceBased) {
 				tran_set = Transition_c.getManySM_TXNsOnR505(
 						StateMachine_c.getManySM_SMsOnR517(InstanceStateMachine_c.getManySM_ISMsOnR518(
@@ -1716,8 +1716,8 @@ public class ParserAllActivityModifier implements IAllActivityModifier {
 				for (int i = 0; i < pkgs.length; i++) {
 					Package_c pkg = pkgs[i];
 					if ( pkg.Isassigned() ) {
-		                pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
-					    initializeBodies(modelRoot, pkg);
+						pkg = Package_c.getOneEP_PKGOnR1402RefersTo(PackageReference_c.getOneEP_PKGREFOnR1402RefersTo(pkg));
+						initializeBodies(modelRoot, pkg);
 					}
 				}
 			} else if (nrme instanceof Package_c) {
