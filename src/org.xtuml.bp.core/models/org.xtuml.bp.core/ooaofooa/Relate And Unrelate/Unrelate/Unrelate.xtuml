@@ -187,38 +187,6 @@ for each Iil in Iils
   end if;
 end for;
 
-/* schedule for deletion AM
-select many links related by relationship_spec->I_LNK[R2904];
-select any matchingLink from instances of I_LNK where false;
-           
-for each link in links
-  // See if this is a link between our source and destination
-  select one sourceParticipant related by link->I_LIP[R2901]->I_INS[R2958];
-  select one destinationParticipant related by link->I_LIP[R2902]->I_INS[R2958];
-  if ( sourceParticipant == source )
-    if(not_empty destination)
-      if ( destinationParticipant == destination )
-        matchingLink = link;
-      end if;
-    else
-      // the destination is empty and the source matched, remove the link
-//      link.dispose();
-      // incomplete match, this may not be our link. Keep looking.
-    end if;
-  elif ( destinationParticipant == destination )
-    if(not_empty source)
-      if ( sourceParticipant == source )
-        matchingLink = link;      
-      end if;
-    else
-      // the source is empty and the desination matched, remove the link
-//      link.dispose();
-      // incomplete match, this may not be our link. Keep looking.
-    end if;
-  end if;
-end for;
-*/
-
 halting = false;
 // if configured in preferences, check link existence
 if (PREF::getBoolean(name:"bridgepoint_prefs_enable_verifier_audit")== true)

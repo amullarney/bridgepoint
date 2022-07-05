@@ -109,48 +109,43 @@ INSERT INTO O_DBATTR
 if not_empty assoc
   phrase = "";
   select one origin related by self->I_LNK[R2901];
-  select one associator related by self->I_LNK[R2903];
-  if(empty associator)
-    select one simp related by assoc->R_SIMP[R206];
-    if(not_empty simp)
-      if (not assoc.isFormalized())
-        select many parts related by simp->R_PART[R207];
-        for each part in parts
-          // in the case of an unformalized association we have two parts
-          phrase = part.Txt_Phrs;
-          if(not_empty origin) // take the first..
-            break;
-          end if;
-        end for;
-      else
-        if(not_empty origin)
-          select one form related by simp->R_FORM[R208];
-          phrase  = form.Txt_Phrs;
-        else
-          select any part related by simp->R_PART[R207];
-          phrase = part.Txt_Phrs;
+  select one simprel related by assoc->R_SIMP[R206];
+  if(not_empty simprel)
+    if (not assoc.isFormalized())
+      select many parts related by simprel->R_PART[R207];
+      for each part in parts
+        // in the case of an unformalized association we have two parts
+        phrase = part.Txt_Phrs;
+        if(not_empty origin) // take the first, else the second..
+          break;
         end if;
+      end for;
+    else
+      // formalized
+      if(not_empty origin)
+        select one form related by simprel->R_FORM[R208];
+        phrase  = form.Txt_Phrs;
+      else
+        select any part related by simprel->R_PART[R207];
+        phrase = part.Txt_Phrs;
       end if;
     end if;
+  else
     select one linked related by assoc->R_ASSOC[R206];
     if(not_empty linked)
       if(empty origin)
         select one aoth related by linked->R_AOTH[R210];
-        if(not_empty aoth)
-          phrase = aoth.Txt_Phrs;
-        end if;
+        phrase = aoth.Txt_Phrs;
       else
         select one aone related by linked->R_AONE[R209];
-        if(not_empty aone)
-          phrase = aone.Txt_Phrs;
-        end if;
-      end if;
+        phrase = aone.Txt_Phrs;
+     end if;
     end if;
   end if;
+  
   if(phrase != "")
     self.Label = assoc.get_name() + "." + Util::getTic() + phrase + Util::getTic();
   else
-    // sub-super association - no phrase used.
     self.Label = assoc.get_name();
   end if;
 else

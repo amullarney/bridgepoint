@@ -137,55 +137,8 @@ select any associative related by associative_local_reference->
                                       RV_IRV[R3308]->L_IIR[R3311]->I_INS[R3013];
 select one relationship_spec related by self->R_REL[R656];
 
-select any relLink from instances of I_LNK where false;
-select many assocIils related by associative->I_LIP[R2958] where selected.Rel_ID == relationship_spec.Rel_ID;
-for each assocIil in assocIils
-  select one relLink related by assocIil->I_LNK[R2903];
-  if not_empty relLink
-    break;
-  end if;
-end for;
-
-/* scheduled for deletion - AM
-select many links related by relationship_spec->I_LNK[R2904];
-select any matchingLink from instances of I_LNK where false;
-
-for each link in links
-  select one sourceParticipant related by link->I_LIP[R2901]->I_INS[R2958];
-  select one destinationParticipant related by link->I_LIP[R2902]->I_INS[R2958];
-  select one associativeParticipant related by link->I_LIP[R2903]->I_INS[R2958];
-  if(not_empty associative)
-    // See if this is a link between our source and destination
-    if ( associativeParticipant == associative )
-      // There is exactly one associative instance per link.
-      // We can therefore unambiguously remove the link
-      matchingLink = link;
-      // See if this is a link between our source and destination
-    end if;
-  elif ( sourceParticipant == source )
-    if(not_empty destination)
-      if ( destinationParticipant == destination )
-        matchingLink = link;
-      end if;
-    else
-      // the destination is empty and the source matched, remove the link
-//      link.dispose();
-      // incomplete match, this may not be our link. Keep looking.
-    end if;
-  elif ( destinationParticipant == destination )
-    if(not_empty source)
-      if ( sourceParticipant == source )
-        // Found the link. Now destroy it.
-        matchingLink = link;
-      end if;
-    else
-      // the source is empty and the desination matched, remove the link
-//      link.dispose();
-      // incomplete match, this may not be our link. Keep looking.
-    end if;
-  end if;
-end for;
-*/
+select any assocIil related by associative->I_LIP[R2958] where selected.Rel_ID == relationship_spec.Rel_ID;
+select one relLink related by assocIil->I_LNK[R2903];
 
 halting = false;
 // if configured in preferences, check existence/multiplicities
