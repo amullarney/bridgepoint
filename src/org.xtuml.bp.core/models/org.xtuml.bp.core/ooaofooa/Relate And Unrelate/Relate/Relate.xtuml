@@ -111,12 +111,12 @@ select one simprel related by relationship_spec->R_SIMP[R206];
 reflexive = relationship_spec.is_reflexive();
 rel_phrase = GD::strip_tics(value:self.relationship_phrase);
 
-relatingFwd = true;
+relatingFwd = true;  // tentative assumption..
 
-if not_empty source and not_empty destination
-  // Attempt to determine the ''sense'' of the relate
-  // If necessary ( and determined ), swap so that ''source'' matches the ''formalizing'' side
+if not_empty source and not_empty destination  // can this even happen?
+
   if not_empty simprel
+    // attempt to order the relate as ''from->to'' for consistency
     if relationship_spec.isFormalized()
       if reflexive
         select one form related by simprel->R_FORM[R208];
@@ -131,9 +131,20 @@ if not_empty source and not_empty destination
           relatingFwd = false;
         end if;
       end if;
+    else
+      // try to make arbitrary, repeatable choice of direction of ''unrelate'', based on phrasing.
+      if rel_phrase != ""
+        select many rParts related by simprel->R_PART[R207];
+        for each rPart in rParts
+          if rPart.Txt_Phrs == rel_phrase  // pick the first of the 2 to act as ''formalizer''
+            relatingFwd = false;
+          end if;
+          break;
+        end for;
+      end if;
     end if;
   else
-    // not simple; must be sub-super
+    // not simple; must be sub-super; ''forward'' means subtype-to-supertype
     select one destClass related by destination->CSME_CIE[R2962]->O_OBJ[R2961];
     select one superclass related by relationship_spec->R_SUBSUP[R206]->R_SUPER[R212]->R_RTO[R204]->R_OIR[R203]->O_OBJ[R201];
     if superclass != destClass
@@ -145,10 +156,11 @@ if not_empty source and not_empty destination
     source = destination;
     destination = swap;
     relatingFwd = true;
-	end if;
+  end if;
 end if;
 
 populationError = false;
+// if configured in preferences, check existence/multiplicities
 if (PREF::getBoolean(name:"bridgepoint_prefs_enable_verifier_audit")== true)
   srcMultiplicity = 0;
   dstMultiplicity = 0;
@@ -182,9 +194,13 @@ if (PREF::getBoolean(name:"bridgepoint_prefs_enable_verifier_audit")== true)
             select any srcPart related by srcClassInAssociations->R_RTO[R203]->R_PART[R204];
             select any dstPart related by dstClassInAssociations->R_RTO[R203]->R_PART[R204];
           else
-            // nothing meaningful to do here: no navigation can distinguish relationship ''sides''
-            select any srcPart related by simprel->R_PART[R207] where selected.Txt_Phrs != rel_phrase;
-            select any dstPart related by simprel->R_PART[R207] where selected.Txt_Phrs == rel_phrase;
+            // unformalized reflexive: arbitrarily choose ''from'' as first r-part
+            select many rParts related by simprel->R_PART[R207];
+            for each rPart in rParts
+              srcPart = rPart;  // arbitrarily pick the first
+              break;
+            end for;
+            select any dstPart related by simprel->R_PART[R207] where selected.Txt_Phrs != srcPart.Txt_Phrs;
           end if;
           srcMultiplicity = srcPart.Mult;
           dstMultiplicity = dstPart.Mult;

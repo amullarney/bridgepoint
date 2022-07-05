@@ -36,6 +36,7 @@ delete object instance self;
 	1,
 	'',
 	"00000000-0000-0000-0000-000000000000",
+	0,
 	0);
 INSERT INTO O_TFR
 	VALUES ("eba0269c-caa5-4e5d-aab3-f5384da17734",
@@ -136,9 +137,19 @@ select any associative related by associative_local_reference->
                                       RV_IRV[R3308]->L_IIR[R3311]->I_INS[R3013];
 select one relationship_spec related by self->R_REL[R656];
 
+select any relLink from instances of I_LNK where false;
+select many assocIils related by associative->I_LIP[R2958] where selected.Rel_ID == relationship_spec.Rel_ID;
+for each assocIil in assocIils
+  select one relLink related by assocIil->I_LNK[R2903];
+  if not_empty relLink
+    break;
+  end if;
+end for;
+
+/* scheduled for deletion - AM
 select many links related by relationship_spec->I_LNK[R2904];
-select any matchingLink related by relationship_spec->I_LNK[R2904] where
-                                       selected.Link_ID == GD::NULL_UNIQUE_ID();
+select any matchingLink from instances of I_LNK where false;
+
 for each link in links
   select one sourceParticipant related by link->I_LIP[R2901]->I_INS[R2958];
   select one destinationParticipant related by link->I_LIP[R2902]->I_INS[R2958];
@@ -158,7 +169,7 @@ for each link in links
       end if;
     else
       // the destination is empty and the source matched, remove the link
-      link.dispose();
+//      link.dispose();
       // incomplete match, this may not be our link. Keep looking.
     end if;
   elif ( destinationParticipant == destination )
@@ -169,17 +180,20 @@ for each link in links
       end if;
     else
       // the source is empty and the desination matched, remove the link
-      link.dispose();
+//      link.dispose();
       // incomplete match, this may not be our link. Keep looking.
     end if;
   end if;
 end for;
+*/
+
 halting = false;
+// if configured in preferences, check existence/multiplicities
 if (PREF::getBoolean(name:"bridgepoint_prefs_enable_verifier_audit")== true)
   auditSev = PREF::getInteger(name:"bridgepoint_prefs_enable_unrelate_audit"); 
   if auditSev != 0  // 0 == Ignore
     severity = "";
-    if empty matchingLink
+    if empty relLink
       severity = "Warning";
       assocPhrase = "";
       if (self.relationship_phrase != "")
@@ -208,13 +222,14 @@ if (PREF::getBoolean(name:"bridgepoint_prefs_enable_verifier_audit")== true)
   end if; // audit is do not ignore
 end if; // audit enabled
 if not halting
-  if not_empty matchingLink
-    matchingLink.dispose();
+  if not_empty relLink
+    relLink.dispose();
   end if;
 end if;',
 	1,
 	'',
 	"e71c3aa5-fb2a-49fd-8efd-852821144ed9",
+	0,
 	0);
 INSERT INTO O_TPARM
 	VALUES ("e9f3901d-09fd-47c3-bf3c-2d6fe3f24b1f",
