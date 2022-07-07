@@ -113,35 +113,47 @@ rel_phrase = GD::strip_tics(value:self.relationship_phrase);
 
 relatingFwd = true;  // tentative assumption..
 
-if not_empty source and not_empty destination  // can this even happen?
-
+if not_empty source and not_empty destination
+  // Variables ''source'' and ''destination'' refer to lexical order in current statement.
+  // By various heuristics, attempt to order the relate as ''from->to'' for consistency
+  // If a ''backward'' relate is detected, swap ''source'' for ''destination''.
+  // This establishes consistency for R2901/R2902 linkage creation.
+  // It also simplifies multiplicity error checking.
   if not_empty simprel
-    // attempt to order the relate as ''from->to'' for consistency
+    select one sourceClass related by source->CSME_CIE[R2962]->O_OBJ[R2961];
     if relationship_spec.isFormalized()
-      if reflexive
+      // Abitrarily, ''forward'' relate is taken to be from R_FORM to R_PART
+      if reflexive  // phrases are mandatory: use them to discriminate
         select one form related by simprel->R_FORM[R208];
         if form.Txt_Phrs == rel_phrase
           relatingFwd = false;
         end if;
       else;
-        select one sourceClass related by source->CSME_CIE[R2962]->O_OBJ[R2961];
-        select one form related by simprel->R_FORM[R208];
-        select one rgoclass related by form->R_RGO[R205]->R_OIR[R203]->O_OBJ[R201];
+        select one rgoclass related by simprel->R_FORM[R208]->R_RGO[R205]->R_OIR[R203]->O_OBJ[R201];
         if rgoclass != sourceClass
           relatingFwd = false;
         end if;
       end if;
     else
-      // try to make arbitrary, repeatable choice of direction of ''unrelate'', based on phrasing.
-      if rel_phrase != ""
-        select many rParts related by simprel->R_PART[R207];
-        for each rPart in rParts
-          if rPart.Txt_Phrs == rel_phrase  // pick the first of the 2 to act as ''formalizer''
+      // Unformalized: need to make repeatable choice of direction of ''relate''.
+      // Arbitrarily, choose the first of the 2 parts to act as ''from''.
+      // [Note: this relies on repeatable ordering of select/for each; see implementation note]
+      // First, try to discriminate based on relationship phrase used in statement.
+      select many rParts related by simprel->R_PART[R207];
+      for each rPart in rParts
+        if rel_phrase != ""
+          if rPart.Txt_Phrs == rel_phrase
             relatingFwd = false;
           end if;
-          break;
-        end for;
-      end if;
+        else
+          // If no phrase, this cannot be reflexive: look at classes involved.
+          select one fromClass related by rPart->R_RTO[R204]->R_OIR[R203]->O_OBJ[R201];
+          if fromClass != sourceClass
+            relatingFwd = false;
+          end if;
+        end if;
+        break;
+      end for;
     end if;
   else
     // not simple; must be sub-super; ''forward'' means subtype-to-supertype
@@ -155,7 +167,6 @@ if not_empty source and not_empty destination  // can this even happen?
     swap = source;
     source = destination;
     destination = swap;
-    relatingFwd = true;
   end if;
 end if;
 
@@ -184,24 +195,20 @@ if (PREF::getBoolean(name:"bridgepoint_prefs_enable_verifier_audit")== true)
           dstMultiplicity = rPart.Mult;
         else
           // if simple association is not formalized, editor supplies 2 ''parts''
+          // unformalized reflexive: arbitrarily choose ''from'' as first r_part
+          // note: relies on select many/for each repeatability
           select any srcPart from instances of R_PART where false;
           select any dstPart from instances of R_PART where false;
-          if not reflexive  // source and destination are different classes - navigate from them
-            select many srcClassInAssociations related by source->CSME_CIE[R2962]->O_OBJ[R2961]->R_OIR[R201]
-              where selected.Rel_ID == relationship_spec.Rel_ID;
-            select many dstClassInAssociations related by destination->CSME_CIE[R2962]->O_OBJ[R2961]->R_OIR[R201]
-             where selected.Rel_ID == relationship_spec.Rel_ID;
-            select any srcPart related by srcClassInAssociations->R_RTO[R203]->R_PART[R204];
-            select any dstPart related by dstClassInAssociations->R_RTO[R203]->R_PART[R204];
-          else
-            // unformalized reflexive: arbitrarily choose ''from'' as first r-part
-            select many rParts related by simprel->R_PART[R207];
-            for each rPart in rParts
+          select many rParts related by simprel->R_PART[R207];
+          i = 1;
+          for each rPart in rParts
+            if i == 1
               srcPart = rPart;  // arbitrarily pick the first
-              break;
-            end for;
-            select any dstPart related by simprel->R_PART[R207] where selected.Txt_Phrs != srcPart.Txt_Phrs;
-          end if;
+            else
+              dstPart = rPart;
+            end if;
+            i = 2;
+          end for;
           srcMultiplicity = srcPart.Mult;
           dstMultiplicity = dstPart.Mult;
         end if;

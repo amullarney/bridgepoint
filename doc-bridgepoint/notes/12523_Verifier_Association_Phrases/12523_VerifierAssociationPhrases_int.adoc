@@ -30,25 +30,60 @@ implementation was observed to make little use of downward navigation
 from the Association data structures, opting instead to attempt multiple 
 upward navigations from the statement variables.
 
+Further examination revealed that the issue was deeper than just incorrect 
+phrase labeling in Verifier's Session Explorer. Associations are realized 
+in Verifier by a data structure (in the Instance Package) which explicitly 
+considers an association to have a preferred 'forward' direction. This concept 
+appears to be modeled on the R_RGO (from), and R_RTO,(to), subtypes of R_OIR 
+when a relationship is formalized. (See Association package].
+
+Verifier explicitly implements an association via two separate associations 
+between the participant instance representatives (Link Participation) and the 
+instance (Link) which realizes the association.  These are R2901, for the 
+'from' participant; R2902, for the 'to' participant.
+
+The code for 'Relate(_Using)::execute and Unrelate(_Using)::execute, under some 
+circumstances, improperly swapped the use of these associations. This not only 
+results in incorrect association phrase display, but can introduce false errors 
+when population consistency is monitored. (The fact that the two associations may 
+be used incorrectly is masked by the fact that both 'Relate' and 'Unrelate' share 
+similar convoluted and incorrect code).
+
 
 === 5.1 The heart of the issue.
 
 The challenge is to correctly identify the 'direction' of an association being 
 related, with respect to the ordering of the participant instances in the 
-'relate' statement and the choice of association phrase used in the statement.
+'relate' statement.
 
-In the case of reflexive associations, both participants are of the same class; 
+When a simple association is formalized, this is readily done, as the Association data 
+structure distinguishes between the 'formalizer' and the 'participant'.
+
+In the case of a reflexive association, both participants are of the same class; 
 it is necessary to discriminate between 'from' and 'to' participants by 
-comparing the relationship phrase used in the 'relate' statement to the mandatory phrases 
-held by the association data structure. When the association is formalized, this 
-is readily done, as the Association data structure distinguishes between the 
-'formalizer' and the 'participant'.
+comparing the required relationship phrase used in the 'relate' statement to the 
+required phrases held by the association data structure. 
 
-In the case of unformalized reflexive associations, however, it is not possible to 
+In the case of unformalized associations, however, it may not be readily easy to 
 distinguish between the two 'participant' (R_PART instances) representing the 
 'source' and 'destination' variables - as in "relate source to destination".
- If, in this context, relate statements with mixed choice of phrase are used, the 
-result may be less than useful.
+
+A pragmatic approach is to arbitrarily select the first of the two R_PART instances 
+as retrieved from a 'select many' followed by a 'for each' as the 'from' part; 
+the second as the 'to'. This, in the context of Verifier's execution 
+engine, at least, provides a repeatable means to discern the 'direction' of a 
+'Relate' or 'Unrelate' statement.
+
+If the unformalized association is phrased , and the statement uses 
+a (non-required) phrase, the 'direction' of the statement can be determined 
+by comparing the statement phrase with the arbitrary 'from' part.
+
+An unformalized reflexive must have, and must use, phrases; use these to determine 
+the 'direction' of the statement.
+
+If the non-reflexive association has no declared phrases - and the statement, 
+therefore cannot use a phrase - it would seem that it matters not in which order 
+the links are established; 
 
 
 === 5.2 The implementation changes.
@@ -63,14 +98,29 @@ While not strictly necessary as part of this work, the code for associative rela
 shared the poor design noted above; it was deemed appropriate to overhaul this while having a 
 clear and current understanding of what was needed.
 
-The function used to supply the relationship phrase for display was slightly modified to 
-match the code changes to the relationship implementation.
+The function used to supply the relationship phrase for display, which relied on the 'unreliable' 
+R2901/2 associations was slightly modified to match the code changes to the relationship.
+
+The reason for creation of a useless Link Participation at each class instance creation, 
+[ Instance::initialize ] for each relationship in which the instance class might participate 
+escapes this analyst; its removal shows no ill-effects.. and greatly helped debugging this 
+code morass.
+
+Note:
+The phrases for R2901/2 are not well chosen; the original mcooa phrases were better.
+The attributes in Link class that formalize those two associations are poorly named.
+The potential disruption involved in unformalizing/reworking/reformalizing the two 
+associations is deemed not worth the time; anybody who needs to understand what is 
+involved here should research this implementation note.
+
+implementation.
 
 == 6 Unit Test
 
 The simple test model supplied in the original issue was used to validate the code change,
 and updated with several tests to validate that the changes did not introduce errors in 
-relationships other than reflexives.
+relationships other than reflexives. Several specific tests were added to address suspect 
+behaviors. The updated code tested correctly against two substantial applications.
 
 == 7 User Documentation
 
@@ -79,13 +129,14 @@ None: this work merely corrected erroneous behavior.
 == 8 Code Changes
 
 - https://github.com/amullarney/bridgepoint
-- 12532_verifier_associations
+- 12532_verifier_associations_revisited
 
 ----
 In org.xtuml.bp.core
 Relate And Unrelate::Relate::execute
 Relate And Unrelate::Relate Using::execute
-Instance::Link Participatio9n::Label
+Instance::Link Participation::Label
+Instance::initialize
 
 ----
 
