@@ -82,9 +82,12 @@ An unformalized reflexive must have, and must use, phrases; use these to determi
 the 'direction' of the statement.
 
 If the non-reflexive association has no declared phrases - and the statement, 
-therefore cannot use a phrase - it would seem that it matters not in which order 
-the links are established; 
+therefore cannot use a phrase - the 'direction' is arbitrarily established from
+the order in which the two parts (R_PART) are retrieved from the Association 
+structure.
 
+The 'direction' of a subtype-supertype association is always deemed to be 'from' 
+the subtype 'to' the supertype.
 
 === 5.2 The implementation changes.
 
@@ -92,14 +95,16 @@ The code was greatly simplified by making use of Association data structure info
 where simple associations are formalized. It proved convenient to swap the order of the 
 source and destination variables when a 'backward' relate was identified - i.e. when the 
 'participant' variable came first in the statement. This simplified the logic when 
-validating multiplicity and also when establishing the linkages which implement the association.
+validating multiplicity and also when establishing the linkages which implement the 
+association.
 
-While not strictly necessary as part of this work, the code for associative relationships 
-shared the poor design noted above; it was deemed appropriate to overhaul this while having a 
-clear and current understanding of what was needed.
+While, perhaps, not strictly necessary as part of this work, the code for associative 
+relationships shared the poor design noted above; it was deemed appropriate to overhaul 
+this while having a clear and current understanding of what was needed.
 
-The function used to supply the relationship phrase for display, which relied on the 'unreliable' 
-R2901/2 associations was slightly modified to match the code changes to the relationship.
+The function used to supply the relationship phrase for display, which relied on the 
+'unreliable' R2901/2 associations was slightly modified to match the code changes to the 
+relationship linkages.
 
 The reason for creation of a useless Link Participation at each class instance creation, 
 [ Instance::initialize ] for each relationship in which the instance class might participate 
