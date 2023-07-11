@@ -8471,6 +8471,8 @@ formchoices[1] = "";  // declare and size the array - even if not presented for 
 formchoices[0] = ""; 
 showchoice = false;
 part_class = "";      // this may be the name of a participant class chosen for simple formalization.
+select any aoid from instances of O_ID where false;  // decl
+select any boid from instances of O_ID where false;  // decl
 
 // Is associative relationship? - some functional changes here: see issue #11699 comment history on why associative re-assignment is disabled.
 // A simple binary association may migrate to associative (linked) if an available class is selected to fulfill that role.
@@ -8555,9 +8557,9 @@ if (not valid_candidates)
 else
   label_text = "Select associative: ";
 end if;
-label_text1 = USER::getLabel(label:label_text);
-LAYOUT::setLayout(field_name:"label_text1", row_num:"4", width:"2", height:"1");
-USER::dependsOn(field1:"label_text1", field2:"is_associative", inverse:false, comparison:"");
+label_assoc_class = USER::getLabel(label:label_text);
+LAYOUT::setLayout(field_name:"label_assoc_class", row_num:"4", width:"2", height:"1");
+USER::dependsOn(field1:"label_assoc_class", field2:"is_associative", inverse:false, comparison:"");
 
 // if appropriate, offer associative candidates only to simple association; see ''valid_cadidates'' logic above
 // do not offer reassign of associative class to established associative: - see issue #11699
@@ -8642,20 +8644,19 @@ if (can_formalize)
     end if;
   end if;
   if (is_formalized)  // establish the formalizing id(s) for display
-	  select any oid from instances of O_ID where false;  // decl
 	  if (not is_associative)
 	    if (not_empty a_part)
-	      select one oid related by a_part->R_RTO[R204]->O_ID[R109];
-	      a_formalizing_ident = oid.get_name();
+	      select one aoid related by a_part->R_RTO[R204]->O_ID[R109];
+	      a_formalizing_ident = aoid.get_name();
 	    else
-        select one oid related by b_part->R_RTO[R204]->O_ID[R109];
-        b_formalizing_ident = oid.get_name();
+        select one boid related by b_part->R_RTO[R204]->O_ID[R109];
+        b_formalizing_ident = boid.get_name();
       end if;	      
 	 	else
-	 	  select one oid related by a_aone->R_RTO[R204]->O_ID[R109];
-      a_formalizing_ident = oid.get_name();
-      select one oid related by b_aoth->R_RTO[R204]->O_ID[R109];
-      b_formalizing_ident = oid.get_name();
+	 	  select one aoid related by a_aone->R_RTO[R204]->O_ID[R109];
+      a_formalizing_ident = aoid.get_name();
+      select one boid related by b_aoth->R_RTO[R204]->O_ID[R109];
+      b_formalizing_ident = boid.get_name();
 	  end if;
 	end if;
 end if;
@@ -8720,7 +8721,7 @@ USER::dependsOn(field1:"choice", field2:"formalize", inverse:true, comparison:"v
 
 // careful! - neither selected if the dropdown was not presented.
 // if non-symmetric reflexive, the choice is a phrase, not a class name!
-if (choice != "")
+if (showchoice)
   if (choice == b_to_a_choice)
     use_a_class = true;
     part_class = a_class.Name;
@@ -8736,16 +8737,26 @@ end if;
 hidelabels = (is_formalized and not formalize);
 
 // Identifier in A class - if formalized, just display the chosen id
-label_text = "";
-if (is_reflexive and not is_symmetric)  // show phrases
-  label_text = "id for  " + Util::getTic() + b_to_a_choice + Util::getTic() + ": ";
+label_text1 = "id:  ";
+label_text2 = "";
+if (not is_reflexive)  // display class name
+  label_text1 = a_class.Name + "  " + label_text1;
 else
-  label_text = a_class.Name + "  id:  ";
+  if (not is_symmetric)  // show phrase
+    label_text2 = " for  " + Util::getTic() + b_to_a_choice + Util::getTic();
+  end if;
 end if;
-if (is_formalized)
-  label_text = label_text + "  " + a_formalizing_ident;
+if (a_formalizing_ident != "")
+  label_text1 = label_text1 + "  " + a_formalizing_ident;
+  select any oidattr related by aoid->O_ATTR[R105];
+  select any refattr related by b_class->O_ATTR[R102] where (selected.Root_Nam == oidattr.Name);
+  if (not_empty refattr)
+    if (refattr.Pfx_Mode == 1)
+      label_text1 = label_text1 + " prefixed " + refattr.Prefix;
+    end if;
+  end if;
 end if;
-a_id_label = USER::getLabel(label:label_text);
+a_id_label = USER::getLabel(label:label_text1);
 LAYOUT::setLayout(field_name:"a_id_label", row_num:"6", width:"2", height:"1");
 USER::dependsOn(field1:"a_id_label", field2:"formalize", inverse:false, comparison:"v_use_a_class");
 USER::dependsOn(field1:"a_id_label", field2:"formalize", inverse:true, comparison:"v_hidelabels");
@@ -8755,27 +8766,101 @@ LAYOUT::setLayout(field_name:"a_id_choice", row_num:"6", width:"1", height:"1");
 USER::dependsOn(field1:"a_id_choice", field2:"formalize", inverse:false, comparison:"v_use_a_class");
 USER::dependsOn(field1:"a_id_choice", field2:"formalize", inverse:true, comparison:"v_is_formalized");
 
+a_id_label2 = USER::getLabel(label:label_text2);
+LAYOUT::setLayout(field_name:"a_id_label2", row_num:"6", width:"2", height:"1");
+USER::dependsOn(field1:"a_id_label2", field2:"formalize", inverse:false, comparison:"v_use_a_class");
+USER::dependsOn(field1:"a_id_label2", field2:"formalize", inverse:false, comparison:"v_is_reflexive");
+USER::dependsOn(field1:"a_id_label2", field2:"formalize", inverse:true, comparison:"v_hidelabels");
+
+apfxorname[1] = "";
+apfxorname[0] = "Prefixed";
+select many oids related by a_class->O_ID[R104.''is identified by''];
+for each oid in oids
+  idname = oid.get_name();
+  if (idname == a_id_choice)
+    select many attrs related by oid->O_ATTR[R105];
+		if (cardinality attrs == 1)
+		  apfxorname[1] = "Renamed";
+		end if;
+    break;
+  end if;
+end for; 
+
+a_pfxname = USER::getDropdown(options:apfxorname, prompt:"", default_selection:0, reload_options:true);
+LAYOUT::setLayout(field_name:"a_pfxname", row_num:"6", width:"1", height:"1");
+USER::dependsOn(field1:"a_pfxname", field2:"formalize", inverse:false, comparison:"v_use_a_class");
+USER::dependsOn(field1:"a_pfxname", field2:"formalize", inverse:true, comparison:"v_hidelabels");
+USER::dependsOn(field1:"a_pfxname", field2:"formalize", inverse:true, comparison:"v_is_formalized");
+
+a_pntext = USER::getText(default:"", prompt:"", require_value:false, validate_name:false);
+LAYOUT::setLayout(field_name:"a_pntext", row_num:"6", width:"1", height:"1");
+USER::dependsOn(field1:"a_pntext", field2:"formalize", inverse:false, comparison:"v_use_a_class");
+USER::dependsOn(field1:"a_pntext", field2:"formalize", inverse:true, comparison:"v_hidelabels");
+USER::dependsOn(field1:"a_pntext", field2:"formalize", inverse:true, comparison:"v_is_formalized");
+
 // Identifier in B class - if formalized, just display the chosen id
-label_text = "";
-if (is_reflexive and not is_symmetric)
-  label_text = "id for  " + Util::getTic() + a_to_b_choice + Util::getTic() + ": ";
+label_text1 = "id:  ";
+label_text2 = "";
+if (not is_reflexive)  // display class name
+  label_text1 = b_class.Name + "  " + label_text1;
 else
-  label_text = b_class.Name + "  id:  ";
+  if (not is_symmetric)  // show phrase
+    label_text2 = " for  " + Util::getTic() + a_to_b_choice + Util::getTic();
+  end if;
 end if;
-if (is_formalized)
-  label_text = label_text + "  " + b_formalizing_ident;
+if (b_formalizing_ident != "")
+  label_text1 = label_text1 + "  " + b_formalizing_ident;
+  select any oidattr related by boid->O_ATTR[R105];
+  select any refattr related by a_class->O_ATTR[R102] where (selected.Root_Nam == oidattr.Name);
+  if (not_empty refattr)
+    if (refattr.Pfx_Mode == 1)
+      label_text1 = label_text1 + " prefixed " + refattr.Prefix;
+    end if;
+  end if;
 end if;
-b_id_label = USER::getLabel(label:label_text);
-LAYOUT::setLayout(field_name:"b_id_label", row_num:"6", width:"2", height:"1");
+b_id_label = USER::getLabel(label:label_text1);
+LAYOUT::setLayout(field_name:"b_id_label", row_num:"7", width:"2", height:"1");
 USER::dependsOn(field1:"b_id_label", field2:"formalize", inverse:false, comparison:"v_use_b_class");
 USER::dependsOn(field1:"b_id_label", field2:"formalize", inverse:true, comparison:"v_hidelabels");
 USER::dependsOn(field1:"b_id_label", field2:"formalize", inverse:true, comparison:"v_is_symmetric");
 
 b_id_choice = USER::getDropdown(options:b_ident_options, prompt:"", default_selection:0, reload_options:true);
-LAYOUT::setLayout(field_name:"b_id_choice", row_num:"6", width:"1", height:"1");
+LAYOUT::setLayout(field_name:"b_id_choice", row_num:"7", width:"1", height:"1");
 USER::dependsOn(field1:"b_id_choice", field2:"formalize", inverse:false, comparison:"v_use_b_class");
 USER::dependsOn(field1:"b_id_choice", field2:"formalize", inverse:true, comparison:"v_is_formalized");
 USER::dependsOn(field1:"b_id_choice", field2:"formalize", inverse:true, comparison:"v_is_symmetric");
+
+b_id_label2 = USER::getLabel(label:label_text2);
+LAYOUT::setLayout(field_name:"b_id_label2", row_num:"7", width:"2", height:"1");
+USER::dependsOn(field1:"b_id_label2", field2:"formalize", inverse:false, comparison:"v_use_b_class");
+USER::dependsOn(field1:"b_id_label2", field2:"formalize", inverse:false, comparison:"v_is_reflexive");
+USER::dependsOn(field1:"b_id_label2", field2:"formalize", inverse:true, comparison:"v_hidelabels");
+
+bpfxorname[1] = "";
+bpfxorname[0] = "Prefixed";
+select many oids related by b_class->O_ID[R104.''is identified by''];
+for each oid in oids
+  idname = oid.get_name();
+  if (idname == b_id_choice)
+    select many attrs related by oid->O_ATTR[R105];
+    if (cardinality attrs == 1)
+      bpfxorname[1] = "Renamed";
+    end if;
+    break;
+  end if;
+end for; 
+
+b_pfxname = USER::getDropdown(options:bpfxorname, prompt:"", default_selection:0, reload_options:true);
+LAYOUT::setLayout(field_name:"b_pfxname", row_num:"7", width:"1", height:"1");
+USER::dependsOn(field1:"b_pfxname", field2:"formalize", inverse:false, comparison:"v_use_b_class");
+USER::dependsOn(field1:"b_pfxname", field2:"formalize", inverse:true, comparison:"v_hidelabels");
+USER::dependsOn(field1:"b_pfxname", field2:"formalize", inverse:true, comparison:"v_is_formalized");
+
+b_pntext = USER::getText(default:"", prompt:"", require_value:false, validate_name:false);
+LAYOUT::setLayout(field_name:"b_pntext", row_num:"7", width:"1", height:"1");
+USER::dependsOn(field1:"b_pntext", field2:"formalize", inverse:false, comparison:"v_use_b_class");
+USER::dependsOn(field1:"b_pntext", field2:"formalize", inverse:true, comparison:"v_hidelabels");
+USER::dependsOn(field1:"b_pntext", field2:"formalize", inverse:true, comparison:"v_is_formalized");
 
 // avoid passing meaningless data to edit (do this here to bypass wizardry)
 if (not formalize)
