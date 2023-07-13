@@ -8737,7 +8737,7 @@ end if;
 hidelabels = (is_formalized and not formalize);
 
 // Identifier in A class - if formalized, just display the chosen id
-label_text1 = "id:  ";
+label_text1 = "id:";
 label_text2 = "";
 if (not is_reflexive)  // display class name
   label_text1 = a_class.Name + "  " + label_text1;
@@ -8749,15 +8749,31 @@ end if;
 if (a_formalizing_ident != "")
   label_text1 = label_text1 + "  " + a_formalizing_ident;
   select any oidattr related by aoid->O_ATTR[R105];
-  select any refattr related by b_class->O_ATTR[R102] where (selected.Root_Nam == oidattr.Name);
-  if (not_empty refattr)
-    if (refattr.Pfx_Mode == 1)
-      label_text1 = label_text1 + " prefixed " + refattr.Prefix;
-    end if;
+  refclass = b_class;
+  if (is_associative)
+    refclass = associative_class;
   end if;
+  select many rattrs related by refclass->O_ATTR[R102]->O_RATTR[R106];
+  for each rattr in rattrs
+    select many orefs related by rattr->O_REF[R108];
+    for each oref in orefs
+      phrs = oref.get_referential_phrase();
+      select one refattr related by oref->O_RTIDA[R111]->O_OIDA[R110]->O_ATTR[R105];
+      if ((refattr == oidattr) and ( phrs == a_phrase));
+	      select one attr related by rattr->O_ATTR[R106];
+	      if (attr.Pfx_Mode == 1)
+	        label_text2 = label_text2 + "   prefixed: " + attr.Prefix;
+	      else
+	        if (attr.Name != oidattr.Name)
+	          label_text2 = label_text2 + "   renamed: " + attr.Name;
+	        end if;
+	      end if;
+	    end if;
+    end for;
+  end for;
 end if;
 a_id_label = USER::getLabel(label:label_text1);
-LAYOUT::setLayout(field_name:"a_id_label", row_num:"6", width:"2", height:"1");
+LAYOUT::setLayout(field_name:"a_id_label", row_num:"6", width:"1", height:"1");
 USER::dependsOn(field1:"a_id_label", field2:"formalize", inverse:false, comparison:"v_use_a_class");
 USER::dependsOn(field1:"a_id_label", field2:"formalize", inverse:true, comparison:"v_hidelabels");
 
@@ -8769,7 +8785,7 @@ USER::dependsOn(field1:"a_id_choice", field2:"formalize", inverse:true, comparis
 a_id_label2 = USER::getLabel(label:label_text2);
 LAYOUT::setLayout(field_name:"a_id_label2", row_num:"6", width:"2", height:"1");
 USER::dependsOn(field1:"a_id_label2", field2:"formalize", inverse:false, comparison:"v_use_a_class");
-USER::dependsOn(field1:"a_id_label2", field2:"formalize", inverse:false, comparison:"v_is_reflexive");
+//USER::dependsOn(field1:"a_id_label2", field2:"formalize", inverse:false, comparison:"v_is_reflexive");
 USER::dependsOn(field1:"a_id_label2", field2:"formalize", inverse:true, comparison:"v_hidelabels");
 
 apfxorname[1] = "";
@@ -8799,7 +8815,7 @@ USER::dependsOn(field1:"a_pntext", field2:"formalize", inverse:true, comparison:
 USER::dependsOn(field1:"a_pntext", field2:"formalize", inverse:true, comparison:"v_is_formalized");
 
 // Identifier in B class - if formalized, just display the chosen id
-label_text1 = "id:  ";
+label_text1 = "id:";
 label_text2 = "";
 if (not is_reflexive)  // display class name
   label_text1 = b_class.Name + "  " + label_text1;
@@ -8811,15 +8827,31 @@ end if;
 if (b_formalizing_ident != "")
   label_text1 = label_text1 + "  " + b_formalizing_ident;
   select any oidattr related by boid->O_ATTR[R105];
-  select any refattr related by a_class->O_ATTR[R102] where (selected.Root_Nam == oidattr.Name);
-  if (not_empty refattr)
-    if (refattr.Pfx_Mode == 1)
-      label_text1 = label_text1 + " prefixed " + refattr.Prefix;
-    end if;
+  refclass = a_class;
+  if (is_associative)
+    refclass = associative_class;
   end if;
+  select many rattrs related by refclass->O_ATTR[R102]->O_RATTR[R106];
+  for each rattr in rattrs
+    select many orefs related by rattr->O_REF[R108];
+    for each oref in orefs
+      phrs = oref.get_referential_phrase();
+      select one refattr related by oref->O_RTIDA[R111]->O_OIDA[R110]->O_ATTR[R105];
+      if ((refattr == oidattr) and ( phrs == b_phrase));
+        select one attr related by rattr->O_ATTR[R106];
+        if (attr.Pfx_Mode == 1)
+          label_text2 = label_text2 + "   prefixed: " + attr.Prefix;
+        else
+          if (attr.Name != oidattr.Name)
+            label_text2 = label_text2 + "   renamed: " + attr.Name;
+          end if;
+        end if;
+      end if;
+    end for;
+  end for;
 end if;
 b_id_label = USER::getLabel(label:label_text1);
-LAYOUT::setLayout(field_name:"b_id_label", row_num:"7", width:"2", height:"1");
+LAYOUT::setLayout(field_name:"b_id_label", row_num:"7", width:"1", height:"1");
 USER::dependsOn(field1:"b_id_label", field2:"formalize", inverse:false, comparison:"v_use_b_class");
 USER::dependsOn(field1:"b_id_label", field2:"formalize", inverse:true, comparison:"v_hidelabels");
 USER::dependsOn(field1:"b_id_label", field2:"formalize", inverse:true, comparison:"v_is_symmetric");
@@ -8833,7 +8865,7 @@ USER::dependsOn(field1:"b_id_choice", field2:"formalize", inverse:true, comparis
 b_id_label2 = USER::getLabel(label:label_text2);
 LAYOUT::setLayout(field_name:"b_id_label2", row_num:"7", width:"2", height:"1");
 USER::dependsOn(field1:"b_id_label2", field2:"formalize", inverse:false, comparison:"v_use_b_class");
-USER::dependsOn(field1:"b_id_label2", field2:"formalize", inverse:false, comparison:"v_is_reflexive");
+//USER::dependsOn(field1:"b_id_label2", field2:"formalize", inverse:false, comparison:"v_is_reflexive");
 USER::dependsOn(field1:"b_id_label2", field2:"formalize", inverse:true, comparison:"v_hidelabels");
 
 bpfxorname[1] = "";
